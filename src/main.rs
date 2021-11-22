@@ -61,6 +61,7 @@ lazy_static! {
   static ref SYMTABLE_BLACKLIST: HashSet<&'static str> = {
     let mut set = HashSet::new();
     set.insert("__mh_execute_header");
+    set.insert("___clang_call_terminate");
     set
   };
 }
@@ -73,7 +74,7 @@ fn read_symtable(file: &Path, verbose: bool) -> Vec<(String, String)> {
   let cmd = std::process::Command::new("nm")
     .arg("--demangle")
     .arg("--defined-only")
-    .arg("-g")
+    // .arg("-g")
     .arg("-P")
     .arg(file)
     .output()
