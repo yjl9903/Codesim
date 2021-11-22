@@ -1,0 +1,22 @@
+name: Build test
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - dev
+      - 'releases/*'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: macos-11
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build
+        run: cargo build --verbose
+      - name: Run
+        run: cargo run -- examples/aplusb.cpp examples/cplusd.cpp --verbose
