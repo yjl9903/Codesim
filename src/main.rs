@@ -4,10 +4,12 @@ extern crate lazy_static;
 extern crate clang;
 
 mod parse;
+mod visitor;
 
 use parse::Parser;
 use std::path::PathBuf;
 use structopt::StructOpt;
+use visitor::get_func_decl;
 
 #[derive(StructOpt)]
 #[structopt(name = "codesim", about = "Diff two single C++ code")]
@@ -32,34 +34,47 @@ fn main() {
 
   let tu = parser.parse(options.code1.into());
 
-  // Get the structs in this translation unit
-  let structs = tu
-    .get_entity()
-    .get_children()
-    .into_iter()
-    .filter(|e| e.get_kind() == clang::EntityKind::StructDecl)
-    .collect::<Vec<_>>();
-
-  // Print information about the structs
-  for struct_ in structs {
-    let type_ = struct_.get_type().unwrap();
-    let size = type_.get_sizeof().unwrap();
-    println!(
-      "struct: {:?} (size: {} bytes)",
-      struct_.get_name().unwrap(),
-      size
-    );
-
-    for field in struct_.get_children() {
-      if let Some(name) = field.get_name() {
-        if let Ok(offset) = type_.get_offsetof(&name) {
-          println!("  field: {:?} (offset: {} bits)", name, offset);
-        } else {
-          println!("  field: {:?}", name);
-        }
-      } else {
-
-      }
+  let funcs = get_func_decl(&tu);
+  println!("Find {} functions", funcs.len());
+  for entity in funcs.iter() {
+    if let Some(name) = entity.get_name() {
+      println!("function: {:?}", name);
     }
+
+    entity.visit_children(|cur, _| {
+      println!("Visit: {:?}", cur);
+      clang::EntityVisitResult::Recurse
+    });
   }
+
+  // // Get the structs in this translation unit
+  // let structs = tu
+  //   .get_entity()
+  //   .get_children()
+  //   .into_iter()
+  //   .filter(|e| e.get_kind() == clang::EntityKind::StructDecl)
+  //   .collect::<Vec<_>>();
+
+  // // Print information about the structs
+  // for struct_ in structs {
+  //   let type_ = struct_.get_type().unwrap();
+  //   let size = type_.get_sizeof().unwrap();
+  //   println!(
+  //     "struct: {:?} (size: {} bytes)",
+  //     struct_.get_name().unwrap(),
+  //     size
+  //   );
+
+  //   for field in struct_.get_children() {
+  //     if let Some(name) = field.get_name() {
+  //       if let Ok(offset) = type_.get_offsetof(&name) {
+  //         println!("  field: {:?} (offset: {} bits)", name, offset);
+  //       } else {
+  //         println!("  field: {:?}", name);
+  //       }
+  //     } else {
+
+  //     }
+  //   }
+  // }
 }

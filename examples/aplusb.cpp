@@ -1,4 +1,5 @@
 #include <iostream>
+#include <functional>
 using namespace std;
 
 struct A {
@@ -29,10 +30,19 @@ private:
   int a, b;
 };
 
+int gcd(int a, int b) {
+  return a ? gcd(b % a, a) : b;
+}
+
 int main() {
   int a, b;
   cin >> a >> b;
   APlusB solver = APlusB(a, b);
-  cout << solver.eval() << endl;
+  cout << "Struct: " << solver.eval() << endl;
+
+  function<int(int,int)> aplusb = [=](int a, int b) {
+    return a + b;
+  };
+  cout << "Lambda: " << aplusb(a, b) << endl;
   return 0;
 }
