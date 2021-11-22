@@ -1,10 +1,10 @@
+mod loader;
+
 #[macro_use]
 extern crate lazy_static;
 
-use std::{
-  collections::HashSet,
-  path::{Path, PathBuf},
-};
+use std::path::PathBuf;
+use loader::Loader;
 use structopt::StructOpt;
 
 #[derive(StructOpt)]
@@ -26,81 +26,12 @@ fn main() {
     println!("Diff: {:?} v.s. {:?}", options.code1, options.code2);
   }
 
-  let c1 = compile(&options.code1);
-  if options.verbose {
-    println!("Compile output of {:?} -> {:?}", &options.code1, &c1);
-  }
+  let ld1 = Loader::new(&options.code1, options.verbose);
+  let ld2 = Loader::new(&options.code2, options.verbose);
 
-  let c2 = compile(&options.code2);
-  if options.verbose {
-    println!("Compile output of {:?} -> {:?}", &options.code2, &c2);
-  }
+  ld1.compile();
+  ld2.compile();
 
-  read_symtable(c1.path(), options.verbose);
-
-  read_symtable(c2.path(), options.verbose);
-}
-
-fn compile(file: &PathBuf) -> tempfile::NamedTempFile {
-  let temp = tempfile::NamedTempFile::new().unwrap();
-
-  std::process::Command::new("clang++")
-    .arg("--std=c++17")
-    .arg("-pedantic")
-    .arg("-O2")
-    .arg(file)
-    .arg("-o")
-    .arg(temp.path())
-    .output()
-    .expect("Failed to compile source file");
-
-  temp
-}
-
-lazy_static! {
-  static ref SYMTABLE_BLACKLIST: HashSet<&'static str> = {
-    let mut set = HashSet::new();
-    set.insert("__mh_execute_header");
-    set.insert("___clang_call_terminate");
-    set
-  };
-}
-
-fn read_symtable(file: &Path, verbose: bool) -> Vec<(String, String)> {
-  if verbose {
-    println!("nm {:?}", file);
-  }
-
-  let cmd = std::process::Command::new("nm")
-    .arg("--demangle")
-    .arg("--defined-only")
-    // .arg("-g")
-    .arg("-P")
-    .arg(file)
-    .output()
-    .expect("Fail to run nm");
-
-  let content = String::from_utf8_lossy(&cmd.stdout).into_owned();
-
-  let mut symbols: Vec<(String, String)> = Vec::new();
-  for line in content.trim_end().split("\n") {
-    let line: Vec<&str> = if line.contains(" T ") {
-      line.trim_end().split(" T ").collect()
-    } else if line.contains(" t ") {
-      line.trim_end().split(" t ").collect()
-    } else {
-      continue;
-    };
-    let func = line.get(0).unwrap().to_string();
-    if SYMTABLE_BLACKLIST.contains(&func[..]) || func.starts_with("std::") {
-      continue;
-    }
-    let address = line.get(1).unwrap().split(" ").next().unwrap().to_string();
-    if verbose {
-      println!("{} -> {}", &func, &address);
-    }
-    symbols.push((func, address));
-  }
-
-  symbols
+  ld1.symbol_table();
+  ld2.symbol_table();
 }
