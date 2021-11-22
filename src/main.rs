@@ -3,8 +3,8 @@ mod loader;
 #[macro_use]
 extern crate lazy_static;
 
-use std::path::PathBuf;
 use loader::Loader;
+use std::path::PathBuf;
 use structopt::StructOpt;
 
 #[derive(StructOpt)]
@@ -32,6 +32,9 @@ fn main() {
   ld1.compile();
   ld2.compile();
 
-  ld1.symbol_table();
-  ld2.symbol_table();
+  let sym1 = ld1.symbol_table();
+  let sym2 = ld2.symbol_table();
+
+  ld1.dump(sym1);
+  ld2.dump(sym2);
 }

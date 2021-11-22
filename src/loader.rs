@@ -1,4 +1,7 @@
-use std::{collections::HashSet, path::PathBuf};
+use std::{
+  collections::{HashMap, HashSet},
+  path::PathBuf,
+};
 
 use tempfile::NamedTempFile;
 
@@ -39,7 +42,11 @@ impl Loader {
       .expect("Failed to compile source file");
 
     if self.verbose {
-      println!("Compile output of {:?} -> {:?}", &self.source, self.elf_temp.path());
+      println!(
+        "Compile output of {:?} -> {:?}",
+        &self.source,
+        self.elf_temp.path()
+      );
     }
   }
 
@@ -80,5 +87,11 @@ impl Loader {
     }
 
     symbols
+  }
+
+  pub fn dump(&self, _symbols: Vec<(String, String)>) -> HashMap<String, Vec<usize>> {
+    let map = HashMap::new();
+    // TODO
+    map
   }
 }
