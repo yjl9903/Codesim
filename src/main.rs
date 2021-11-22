@@ -71,11 +71,10 @@ fn read_symtable(file: &Path, verbose: bool) -> Vec<(String, String)> {
   }
 
   let cmd = std::process::Command::new("nm")
+    .arg("--demangle")
     .arg("--defined-only")
     .arg("-g")
     .arg("-P")
-    .arg("--demangle")
-    .arg("-S")
     .arg(file)
     .output()
     .expect("Fail to run nm");
@@ -92,7 +91,7 @@ fn read_symtable(file: &Path, verbose: bool) -> Vec<(String, String)> {
       continue;
     };
     let func = line.get(0).unwrap().to_string();
-    if SYMTABLE_BLACKLIST.contains(&func[..]) {
+    if SYMTABLE_BLACKLIST.contains(&func[..]) || func.starts_with("std::") {
       continue;
     }
     let address = line.get(1).unwrap().split(" ").next().unwrap().to_string();
