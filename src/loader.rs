@@ -31,6 +31,10 @@ impl Loader {
   }
 
   pub fn compile(&self) {
+    if self.verbose {
+      println!("$ clang++ --std=c++17 -pedantic -O2 {:?}", self.source);
+    }
+
     std::process::Command::new("clang++")
       .arg("--std=c++17")
       .arg("-pedantic")
@@ -42,10 +46,7 @@ impl Loader {
       .expect("Failed to compile source file");
 
     if self.verbose {
-      println!(
-        "Compile output: {:?}",
-        self.elf_temp.path()
-      );
+      println!("Compile output: {:?}", self.elf_temp.path());
     }
   }
 
@@ -81,7 +82,7 @@ impl Loader {
       let address = line.get(1).unwrap().split(" ").next().unwrap().to_string();
       let address = u64::from_str_radix(&address, 16).unwrap();
       if self.verbose {
-        println!("Func: {} -> {}", &func, &address);
+        println!("Func: {} -> {:#11x}", &func, &address);
       }
       symbols.push((func, address));
     }
@@ -138,9 +139,14 @@ impl Loader {
 
           if self.verbose {
             let func = func_address.get(&address).unwrap();
-            println!("Found func: {:?} -> {:?} (size: {:?})", func, address, code.len());
+            println!(
+              "Found func: {:?} -> {:#11x} (size: {:?})",
+              func,
+              address,
+              code.len()
+            );
           }
-          
+
           map.insert(address, code);
         } else {
           i = i + 1;

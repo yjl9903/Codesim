@@ -5,6 +5,7 @@ mod solver;
 extern crate lazy_static;
 
 use loader::Loader;
+use solver::Solver;
 use std::path::PathBuf;
 use structopt::StructOpt;
 
@@ -34,7 +35,7 @@ fn main() {
   let ld1 = Loader::new(&options.code1, options.verbose);
   ld1.compile();
   let sym1 = ld1.symbol_table();
-  ld1.dump(sym1);
+  let func1 = ld1.dump(sym1);
 
   if options.verbose {
     println!();
@@ -43,10 +44,13 @@ fn main() {
   let ld2 = Loader::new(&options.code2, options.verbose);
   ld2.compile();
   let sym2 = ld2.symbol_table();
-  ld2.dump(sym2);
+  let func2 = ld2.dump(sym2);
 
+  // Run diff
+  let solver = Solver::new(func1, func2, options.verbose);
   if options.verbose {
     println!();
     println!("--- Calc function similarity ---")
   }
+  solver.construct(1.5, 2.0, 0.5);
 }
