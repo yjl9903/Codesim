@@ -23,7 +23,7 @@ jobs:
         with:
           script: |
             const { readdirSync } = require('fs');
-            const dirents = fs.readdirSync('${{ github.event.inputs.root }}', { withFileTypes: true });
+            const dirents = readdirSync('${{ github.event.inputs.root }}', { withFileTypes: true });
             const files = [];
             for (const dirent of dirents) {
               if (dirent.isFile()) {
