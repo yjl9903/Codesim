@@ -1,4 +1,4 @@
-name: Build test
+name: Detect Code Plagiarism 
 
 on:
   workflow_dispatch:
@@ -12,7 +12,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
+  run:
     runs-on: macos-11
     steps:
       - uses: actions/checkout@v2
