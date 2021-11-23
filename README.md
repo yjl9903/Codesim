@@ -8,10 +8,6 @@ Get the latest Rust.
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
-Get the latest llvm and libclang at [Release LLVM 13.0.0 · llvm/llvm-project](https://github.com/llvm/llvm-project/releases/tag/llvmorg-13.0.0).
-
-Make sure that you have downloaded `libclany.dylib` (for Mac OS) or `libclang.so` (for Linux) in right place (for example `/usr/lib` or `/usr/local/lib`). You can see more details at [clang-sys](https://github.com/KyleMayes/clang-sys#linking).
-
 Install codesim locally.
 
 ```bash
