@@ -1,0 +1,47 @@
+name: Build test
+
+on:
+  workflow_dispatch:
+    inputs:
+      root:
+        description: 'Root dir for codes'
+        required: true
+        default: 'examples'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: macos-11
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build
+        run: cargo install --path .
+      - name: Upgrade dep
+        uses: actions/github-script@v5
+        with:
+          script: |
+            const { readdirSync } = require('fs');
+            const dirents = fs.readdirSync('${{ github.event.inputs.root }}', { withFileTypes: true });
+            const files = [];
+            for (const dirent of dirents) {
+              if (dirent.isFile()) {
+                files.push(dirent.name);
+              }
+            }
+            const result = [];
+            for (const a of files) {
+              for (const b of files) {
+                if (a !== b) {
+                  let val = (await exec.getExecOutput('codesim', [a, b])).stdout;
+                  result.push({
+                    a, b, val: Number.parseFloat(val)
+                  });
+                }
+              }
+            }
+            result.sort((lhs, rhs) => rhs.val - lhs.val);
+            for (const { a, b, val } of result) {
+              console.log(`${a} v.s. ${b} : ${val}`);
+            }
