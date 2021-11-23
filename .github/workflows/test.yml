@@ -27,7 +27,7 @@ jobs:
             const files = [];
             for (const dirent of dirents) {
               if (dirent.isFile()) {
-                files.push(dirent.name);
+                files.push('./${{ github.event.inputs.root }}/' + dirent.name);
               }
             }
             const result = [];
