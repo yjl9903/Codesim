@@ -10,6 +10,10 @@ use solver::Solver;
 use std::path::PathBuf;
 use structopt::StructOpt;
 
+const OMEGA: f64 = 1.5;
+const ALPHA: f64 = 2.0;
+const BETA: f64 = 0.5;
+
 #[derive(StructOpt)]
 #[structopt(name = "codesim", about = "Diff two single C++ code")]
 struct CliOption {
@@ -47,13 +51,15 @@ fn main() {
   let sym2 = ld2.symbol_table();
   let func2 = ld2.dump(sym2);
 
+  let sum_func1 = func1.iter().map(|(_, body)| body.len()).sum::<usize>();
+
   // Run diff
   let solver = Solver::new(func1, func2, options.verbose);
   if options.verbose {
     println!();
     println!("--- Calc function similarity ---");
   }
-  let builder = solver.construct(1.5, 2.0, 0.5);
+  let builder = solver.construct(OMEGA, ALPHA, BETA);
 
   // Run flow
   if options.verbose {
@@ -70,5 +76,7 @@ fn main() {
     println!();
   }
 
-  println!("{:.2}", result.1.abs());
+  let sum_func1 = sum_func1 as f64 / (1.0 + (-ALPHA + BETA).exp());
+  let score = 100.0 * result.1 / sum_func1;
+  println!("{:.2}", score);
 }
