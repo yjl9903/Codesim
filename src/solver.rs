@@ -31,7 +31,14 @@ impl Solver {
         println!("Label {:?}: {}", &label, i);
       }
       builder.set_label(i, label);
+
       builder.add_edge(source, i, body.len() as CapType, 0 as CostType);
+      if self.verbose {
+        println!(
+          "Edge source -> 1:{:#11x} with cap = {}, cost = {}",
+          func, body.len(), 0
+        );
+      }
     }
     for (i, (func, body)) in self.code2.iter().enumerate() {
       let label = format!("2:{:#11x}", func);
@@ -40,7 +47,14 @@ impl Solver {
         println!("Label {:?}: {}", &label, node);
       }
       builder.set_label(node, label);
+
       builder.add_edge(node, sink, body.len() as CapType, 0 as CostType);
+      if self.verbose {
+        println!(
+          "Edge 2:{:#11x} -> sink with cap = {}, cost = {}",
+          func, body.len(), 0
+        );
+      }
     }
 
     for (i, f1) in self.code1.iter().enumerate() {
@@ -60,7 +74,10 @@ impl Solver {
               .exp());
 
         if self.verbose {
-          println!("Edge 1:{:#11x} -> 2:{:#11x} with cap = {}, cost = {}", f1.0, f2.0, sim, cost);
+          println!(
+            "Edge 1:{:#11x} -> 2:{:#11x} with cap = {}, cost = {}",
+            f1.0, f2.0, sim, cost
+          );
         }
 
         builder.add_edge(i, j + self.code1.len(), sim, cost);

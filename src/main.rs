@@ -60,7 +60,15 @@ fn main() {
     println!();
     println!("--- Run MCMF ---");
   }
-  let graph = builder.build();
+  let graph = builder.build(true, options.verbose);
   let result = graph.mcmf();
-  println!("{}", result.1);
+
+  if options.verbose {
+    println!();
+    println!("--- Result ---");
+    println!("Flow = {}, Cost = {}", result.0, result.1.abs());
+    println!();
+  }
+
+  println!("{:.2}", result.1.abs());
 }
