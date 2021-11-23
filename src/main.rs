@@ -1,3 +1,4 @@
+mod flow;
 mod loader;
 mod solver;
 
@@ -50,7 +51,16 @@ fn main() {
   let solver = Solver::new(func1, func2, options.verbose);
   if options.verbose {
     println!();
-    println!("--- Calc function similarity ---")
+    println!("--- Calc function similarity ---");
   }
-  solver.construct(1.5, 2.0, 0.5);
+  let builder = solver.construct(1.5, 2.0, 0.5);
+
+  // Run flow
+  if options.verbose {
+    println!();
+    println!("--- Run MCMF ---");
+  }
+  let graph = builder.build();
+  let result = graph.mcmf();
+  println!("{}", result.1);
 }

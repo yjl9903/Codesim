@@ -1,8 +1,9 @@
 use std::{
-  collections::{HashMap, HashSet},
+  collections::{BTreeMap, HashMap, HashSet},
   path::PathBuf,
 };
 
+use regex::Regex;
 use tempfile::NamedTempFile;
 
 lazy_static! {
@@ -12,6 +13,7 @@ lazy_static! {
     set.insert("___clang_call_terminate");
     set
   };
+  static ref CODE_REGEX: Regex = Regex::new(r"([0-9a-f][0-9a-f] )+").unwrap();
 }
 
 pub struct Loader {
@@ -90,7 +92,7 @@ impl Loader {
     symbols
   }
 
-  pub fn dump(&self, symbols: Vec<(String, u64)>) -> HashMap<u64, Vec<u64>> {
+  pub fn dump(&self, symbols: Vec<(String, u64)>) -> BTreeMap<u64, Vec<u64>> {
     if self.verbose {
       println!("$ objdump -d {:?}", self.elf_temp.path());
     }
@@ -118,7 +120,24 @@ impl Loader {
       }
     }
 
-    let mut map = HashMap::new();
+    fn parse_code(line: &str) -> Option<u64> {
+      if let Some(capture) = CODE_REGEX.captures(line) {
+        if let Some(matched) = capture.get(0) {
+          let code = matched
+            .as_str()
+            .chars()
+            .filter(|c| !c.is_whitespace())
+            .collect::<String>();
+          u64::from_str_radix(&code, 16).map_or(None, |c| Some(c))
+        } else {
+          None
+        }
+      } else {
+        None
+      }
+    }
+
+    let mut map = BTreeMap::new();
     let mut i = 0 as usize;
     let content = String::from_utf8_lossy(&cmd.stdout).into_owned();
     let content = content.trim().split("\n").collect::<Vec<&str>>();
@@ -129,9 +148,13 @@ impl Loader {
         if func_address.contains_key(&address) {
           let mut code = Vec::new();
           while i < content.len() {
-            if let Some(address) = parse_address(content[i]) {
-              code.push(address);
-              i = i + 1;
+            if let Some(_) = parse_address(content[i]) {
+              if let Some(cmd) = parse_code(content[i]) {
+                code.push(cmd);
+                i = i + 1;
+              } else {
+                break;
+              }
             } else {
               break;
             }
