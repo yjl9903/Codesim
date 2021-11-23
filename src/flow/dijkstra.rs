@@ -11,9 +11,9 @@ impl Ord for State {
     if self.eq(other) {
       std::cmp::Ordering::Equal
     } else if self.cost < other.cost {
-      std::cmp::Ordering::Less
-    } else {
       std::cmp::Ordering::Greater
+    } else {
+      std::cmp::Ordering::Less
     }
   }
 }
@@ -24,7 +24,7 @@ impl PartialOrd for State {
   }
 }
 
-pub const EPS: CostType = 1e-5;
+pub const EPS: CostType = 1e-8;
 
 impl Eq for State {}
 
@@ -36,9 +36,9 @@ impl PartialEq for State {
 
 impl Graph {
   pub fn dijkstra(&self, start: usize) -> (Vec<f64>, Vec<Option<usize>>) {
-    let mut vis = vec![false; self.n];
-    let mut dis = vec![COSTMAX; self.n];
-    let mut pre: Vec<Option<usize>> = vec![None; self.n];
+    let mut vis = vec![false; self.n + 1];
+    let mut dis = vec![COSTMAX; self.n + 1];
+    let mut pre: Vec<Option<usize>> = vec![None; self.n + 1];
 
     dis[start] = 0 as CostType;
     let mut heap = BinaryHeap::new();
@@ -52,16 +52,29 @@ impl Graph {
         continue;
       }
       vis[u] = true;
-      for e in self.succ_of(u) {
-        let to = e.to;
-        let cost = self.reduced_cost(&e);
-        if e.cap != 0 && dis[to] > d + cost {
-          dis[to] = d + cost;
-          pre[to] = Some(e.id);
-          heap.push(State {
-            cost: dis[to],
-            node: to,
-          });
+      if u == self.n {
+        for to in 0..self.n {
+          let cost = -self.phi[to];
+          if dis[to] > d + cost + EPS {
+            dis[to] = d + cost;
+            heap.push(State {
+              cost: dis[to],
+              node: to,
+            });
+          }
+        }
+      } else {
+        for e in self.succ_of(u) {
+          let to = e.to;
+          let cost = self.reduced_cost(&e);
+          if e.cap != 0 && dis[to] > d + cost + EPS {
+            dis[to] = d + cost;
+            pre[to] = Some(e.id);
+            heap.push(State {
+              cost: dis[to],
+              node: to,
+            });
+          }
         }
       }
     }

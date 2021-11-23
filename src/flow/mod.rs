@@ -2,6 +2,8 @@ mod dijkstra;
 
 use std::collections::{BinaryHeap, HashMap};
 
+pub use dijkstra::EPS;
+
 pub type CapType = i64;
 
 pub type CostType = f64;
@@ -10,8 +12,6 @@ pub const COSTMAX: CostType = 10000000000.0;
 
 pub struct Graph {
   n: usize,
-  source: usize,
-  sink: usize,
   phi: Vec<CostType>,
   edges: Vec<Edge>,
   succ: Vec<Vec<usize>>,
@@ -55,7 +55,6 @@ impl Builder {
   }
 
   pub fn build(&self, max_cost: bool, verbose: bool) -> Graph {
-    let mut sum_edges = 0;
     let mut edges = vec![];
     let mut succ = vec![vec![]; self.n];
 
@@ -96,22 +95,18 @@ impl Builder {
 
     for (from, to, cap, cost) in self.edges.iter() {
       add(*from, *to, *cap, *cost);
-      sum_edges += 2;
     }
 
     // Last edge for T -> S
     let sum_cap = self.edges.iter().map(|(_, _, cap, _)| cap).sum::<CapType>();
-    add(
-      self.sink,
-      self.source,
-      sum_cap + 5,
-      -(sum_edges as CostType + 5.0),
-    );
+    if !max_cost {
+      add(self.sink, self.source, sum_cap + 5, -COSTMAX);
+    } else {
+      add(self.sink, self.source, sum_cap + 5, COSTMAX);
+    }
 
     Graph {
       n: self.n,
-      source: self.source,
-      sink: self.sink,
       phi: vec![0 as CostType; self.n],
       edges,
       succ,
@@ -121,13 +116,13 @@ impl Builder {
   }
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 enum EdgeKind {
   Normal(usize),
   Rev(usize),
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 struct Edge {
   id: usize,
   from: usize,
@@ -177,7 +172,6 @@ impl Graph {
       for &eid in normal_edges.iter() {
         let raw_cap = self.edges[eid].raw_cap;
         if ((raw_cap >> bit) & 1) != 0 {
-          dbg!(eid, raw_cap);
           self.add_one_cap(eid);
         }
       }
@@ -193,7 +187,7 @@ impl Graph {
     if self.max_cost {
       cost = -cost;
     }
-    (self.edges.last().unwrap().cap, cost)
+    (self.edges[edges_len - 1].cap, cost)
   }
 
   fn add_one_cap(&mut self, eid: usize) {
@@ -206,10 +200,15 @@ impl Graph {
     let to = self.edges[eid].to;
     let (dis, pre) = self.dijkstra(to);
 
-    if dis[from] < COSTMAX && dis[from] + self.reduced_cost(&self.edges[eid]) < 0 as CostType
+    if dis[from] < COSTMAX - EPS
+      && dis[from] + self.reduced_cost(&self.edges[eid]) < 0 as CostType - EPS
     {
       let rev = self.edges[eid].rev();
       self.edges[rev].cap += 1;
+
+      if self.verbose {
+        print!("Flow 1: {}", self.edges[eid].to);
+      }
 
       let mut u = from;
       let v = to;
@@ -218,35 +217,49 @@ impl Graph {
           self.edges[xid].cap -= 1;
           let rev = self.edges[xid].rev();
           self.edges[rev].cap += 1;
+
+          if self.verbose {
+            print!(" -> {}", u);
+          }
+
           u = self.edges[xid].from;
         } else {
-          break;
+          panic!("Path fail");
         }
       }
+
+      if self.verbose {
+        println!(" -> {}", self.edges[eid].to);
+      }
     } else {
+      if self.verbose {
+        println!("Flow 2: {} -> {}", self.edges[eid].from, self.edges[eid].to);
+      }
+
       self.edges[eid].cap += 1;
     }
 
     let mut max_dis = 0 as CostType;
     let cur_len = self.reduced_cost(&self.edges[eid]);
     for i in 0..self.n {
-      if dis[i] < COSTMAX && dis[i] > max_dis + dijkstra::EPS {
+      if dis[i] < COSTMAX - EPS && dis[i] > max_dis + EPS {
         max_dis = dis[i];
       }
     }
+
     for i in 0..self.n {
-      if dis[i] < COSTMAX {
+      if dis[i] < COSTMAX - EPS {
         self.phi[i] += dis[i];
       } else {
         self.phi[i] += max_dis;
-        if cur_len < 0 as CostType {
+        if cur_len < 0 as CostType - EPS {
           self.phi[i] -= cur_len;
         }
       }
     }
 
-    let (dis, _) = self.dijkstra(self.sink);
-    for i in 0 .. self.n {
+    let (dis, _) = self.dijkstra(self.n);
+    for i in 0..self.n {
       self.phi[i] += dis[i];
     }
   }
@@ -258,7 +271,7 @@ impl Graph {
 
 #[cfg(test)]
 mod test_flow {
-  use super::Builder;
+  use super::*;
 
   #[test]
   fn example() {
@@ -271,5 +284,7 @@ mod test_flow {
     let graph = builder.build(false, true);
     let result = graph.mcmf();
     dbg!(result);
+    assert_eq!(result.0, 50);
+    assert!((result.1 - 280.0).abs() < EPS);
   }
 }

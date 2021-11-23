@@ -36,7 +36,9 @@ impl Solver {
       if self.verbose {
         println!(
           "Edge source -> 1:{:#11x} with cap = {}, cost = {}",
-          func, body.len(), 0
+          func,
+          body.len(),
+          0
         );
       }
     }
@@ -52,7 +54,9 @@ impl Solver {
       if self.verbose {
         println!(
           "Edge 2:{:#11x} -> sink with cap = {}, cost = {}",
-          func, body.len(), 0
+          func,
+          body.len(),
+          0
         );
       }
     }
