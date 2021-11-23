@@ -37,15 +37,20 @@ impl Loader {
       println!("$ clang++ --std=c++17 -pedantic -O2 {:?}", self.source);
     }
 
-    std::process::Command::new("clang++")
+    let res = std::process::Command::new("clang++")
       .arg("--std=c++17")
       .arg("-pedantic")
       .arg("-O2")
       .arg(&self.source)
       .arg("-o")
       .arg(self.elf_temp.path())
-      .output()
-      .expect("Failed to compile source file");
+      .output();
+    
+    if let Ok(cmd) = res {
+      if cmd.stderr.len() > 0 {
+        panic!("Fail to compile {:?}", self.source);
+      }
+    }
 
     if self.verbose {
       println!("Compile output: {:?}", self.elf_temp.path());

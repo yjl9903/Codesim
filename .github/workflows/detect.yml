@@ -34,10 +34,12 @@ jobs:
             for (const a of files) {
               for (const b of files) {
                 if (a !== b) {
-                  let val = (await exec.getExecOutput('codesim', [a, b])).stdout;
-                  result.push({
-                    a, b, val: Number.parseFloat(val)
-                  });
+                  try {
+                    let val = (await exec.getExecOutput('codesim', [a, b])).stdout;
+                    result.push({
+                      a, b, val: Number.parseFloat(val)
+                    });
+                  } catch {}
                 }
               }
             }
