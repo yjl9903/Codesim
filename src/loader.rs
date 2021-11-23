@@ -43,8 +43,7 @@ impl Loader {
 
     if self.verbose {
       println!(
-        "Compile output of {:?} -> {:?}",
-        &self.source,
+        "Compile output: {:?}",
         self.elf_temp.path()
       );
     }
@@ -52,7 +51,7 @@ impl Loader {
 
   pub fn symbol_table(&self) -> Vec<(String, u64)> {
     if self.verbose {
-      println!("nm {:?}", self.source);
+      println!("$ nm {:?}", self.elf_temp.path());
     }
 
     let cmd = std::process::Command::new("nm")
@@ -92,7 +91,7 @@ impl Loader {
 
   pub fn dump(&self, symbols: Vec<(String, u64)>) -> HashMap<u64, Vec<u64>> {
     if self.verbose {
-      println!("objdump -d {:?}", self.source);
+      println!("$ objdump -d {:?}", self.elf_temp.path());
     }
 
     let func_address = symbols
