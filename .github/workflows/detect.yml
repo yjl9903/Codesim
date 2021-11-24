@@ -39,10 +39,8 @@ jobs:
               if (dirent.isFile()) {
                 const filename = './${{ github.event.inputs.root }}/' + dirent.name;
                 try {
-                  const stderr = (await exec.getExecOutput('clang++', [filename, '--std=c++17', '-pedantic', '-O2'])).stderr;
-                  if (stderr.length === 0) {
-                    files.push(filename);
-                  }
+                  await exec.getExecOutput('clang++', [filename, '--std=c++17', '-pedantic', '-O2']);
+                  files.push(filename);
                 } catch {}
               }
             }
