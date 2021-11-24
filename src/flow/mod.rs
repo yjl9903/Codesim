@@ -10,6 +10,8 @@ pub type CostType = f64;
 
 pub const COSTMAX: CostType = 10000000000.0;
 
+pub const COSTARG: CostType = 100.0;
+
 pub struct Graph {
   n: usize,
   phi: Vec<CostType>,
@@ -58,7 +60,7 @@ impl Builder {
     let mut edges = vec![];
     let mut succ = vec![vec![]; self.n];
 
-    let mul_cost = if max_cost {
+    let mul_cost = COSTARG * if max_cost {
       -1 as CostType
     } else {
       1 as CostType

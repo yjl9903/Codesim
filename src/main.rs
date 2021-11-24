@@ -80,6 +80,6 @@ fn main() {
   }
 
   let sum_func1 = sum_func1 as f64 / (1.0 + (-ALPHA + BETA).exp());
-  let score = 100.0 * result.1 / sum_func1;
+  let score = result.1 / sum_func1;
   println!("{:.2}", score.abs());
 }
