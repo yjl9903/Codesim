@@ -6,7 +6,7 @@ struct State {
   node: usize,
 }
 
-pub const EPS: CostType = 1e-8;
+pub const EPS: CostType = 1e-4;
 
 impl Ord for State {
   fn cmp(&self, other: &Self) -> std::cmp::Ordering {
