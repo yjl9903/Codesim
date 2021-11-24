@@ -8,9 +8,9 @@ pub type CapType = i64;
 
 pub type CostType = f64;
 
-pub const COSTMAX: CostType = 10000000000.0;
-
 pub const COSTARG: CostType = 100.0;
+
+pub const COSTMAX: CostType = 10000.0 * COSTARG;
 
 pub struct Graph {
   n: usize,
