@@ -15,9 +15,9 @@ impl Ord for State {
     } else if (self.cost - other.cost).abs() <= EPS {
       self.node.cmp(&other.node)
     } else if self.cost < other.cost {
-      std::cmp::Ordering::Greater
-    } else {
       std::cmp::Ordering::Less
+    } else {
+      std::cmp::Ordering::Greater
     }
   }
 }
