@@ -35,7 +35,10 @@ jobs:
             const files = [];
             for (const dirent of dirents) {
               if (dirent.isFile()) {
-                files.push('./${{ github.event.inputs.root }}/' + dirent.name);
+                const stderr = (await exec.getExecOutput('clang++', [dirent.name, '--std=c++17', '-pedantic', '-O2'])).stderr;
+                if (stderr.length === 0) {
+                  files.push('./${{ github.event.inputs.root }}/' + dirent.name);
+                }
               }
             }
             const result = [];
@@ -55,7 +58,7 @@ jobs:
             for (const { a, b, val } of result) {
               console.log(`${a} v.s. ${b} : ${val}`);
             }
-            writeFileSync('data.csv', result.map(r => `${r.a}, ${r.b}, ${r.val}`).join('\n'), 'utf-8');
+            writeFileSync('data.csv', 'code1,code2,similarity' + result.map(r => `${r.a}, ${r.b}, ${r.val}`).join('\n'), 'utf-8');
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
