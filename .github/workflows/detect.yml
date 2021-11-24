@@ -35,6 +35,7 @@ jobs:
         uses: actions/github-script@v5
         with:
           script: |
+            const { basename } = require('path');
             const { readdirSync, writeFileSync } = require('fs');
             const dirents = readdirSync('${{ github.event.inputs.root }}', { withFileTypes: true });
             const files = [];
@@ -63,11 +64,13 @@ jobs:
             }
             result.sort((lhs, rhs) => rhs.val - lhs.val);
             for (const { a, b, val } of result) {
+              if (val <= 10.0) break;
               console.log(`${a} v.s. ${b} : ${val}`);
             }
-            writeFileSync('data.csv', 'code1,code2,similarity\n' + result.map(r => `${r.a}, ${r.b}, ${r.val}`).join('\n'), 'utf-8');
+            await io.mkdirP('report');
+            writeFileSync(`report/${ basename('${{ github.event.inputs.root }}') }.csv`, 'code1,code2,similarity\n' + result.map(r => `${r.a}, ${r.b}, ${r.val}`).join('\n'), 'utf-8');
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
           name: report
-          path: data.csv
+          path: report/
