@@ -8,7 +8,9 @@ pub type CapType = i64;
 
 pub type CostType = f64;
 
-pub const COSTARG: CostType = 100.0;
+pub const COSTOFFSET: CostType = 10.0;
+
+pub const COSTARG: CostType = 100.0 * COSTOFFSET;
 
 pub const COSTMAX: CostType = 100000.0 * COSTARG;
 
@@ -182,6 +184,7 @@ impl Graph {
         cost += e.cost * self.edges[e.rev()].cap as CostType;
       }
     }
+    cost = cost / COSTOFFSET;
     if self.max_cost {
       cost = -cost;
     }
