@@ -16,7 +16,7 @@ cargo install --path .
 
 Ensure you have installed `clang` in your computer, and corresponding `nm`, `objdump` has been properly set in your path env.
 
-**Mac OS is highly recommended**.
+**Mac OS is highly recommended**. **Linux and Windows are not verified**.
 
 ## Usage
 
@@ -44,3 +44,7 @@ If you have not installed `clang`, you can pre-compile two codes manually, and p
 ```bash
 codesim a.out b.out --skip-compile
 ```
+
+## Github Actions
+
+If you do not have a Mac OS machine, you can try it with the power of [Github Actions](https://github.com/features/actions). Github Actions config file has been provided in `/.github/workflows/`. You can put the example codes in this repo, and run "Detect Code Plagiarism" in the web page manually.
