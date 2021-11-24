@@ -1,6 +1,6 @@
 mod dijkstra;
 
-use std::collections::{BinaryHeap, HashMap};
+use std::collections::{BinaryHeap, HashMap, HashSet};
 
 pub use dijkstra::EPS;
 
@@ -212,7 +212,14 @@ impl Graph {
 
       let mut u = from;
       let v = to;
+      let mut set: HashSet<usize> = HashSet::new();
       while u != v {
+        if set.contains(&u) {
+          eprintln!("Error: Find negative loop");
+          break;
+        } else {
+          set.insert(u);
+        }
         if let Some(xid) = pre[u] {
           self.edges[xid].cap -= 1;
           let rev = self.edges[xid].rev();
