@@ -113,7 +113,10 @@ impl Loader {
     }
 
     if symbols.is_empty() {
-      eprintln!("No symbol found in {:?}, please check your code or elf.", self.elf());
+      eprintln!(
+        "No symbol found in {:?}, please check your code or elf.",
+        self.elf()
+      );
       panic!();
     }
 
@@ -208,7 +211,10 @@ impl Loader {
     }
 
     if map.is_empty() {
-      eprintln!("No symbol found in {:?}, please check your code or elf.", self.elf());
+      eprintln!(
+        "No symbol found in {:?}, please check your code or elf.",
+        self.elf()
+      );
       panic!();
     }
 

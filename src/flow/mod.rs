@@ -8,9 +8,7 @@ pub type CapType = i64;
 
 pub type CostType = f64;
 
-pub const COST_OFFSET: CostType = 10.0;
-
-pub const COST_ARG: CostType = 100.0 * COST_OFFSET;
+pub const COST_ARG: CostType = 100.0;
 
 pub const COST_MAX: CostType = 100000.0 * COST_ARG;
 
@@ -186,7 +184,6 @@ impl Graph {
         cost += e.cost * self.edges[e.rev()].cap as CostType;
       }
     }
-    cost = cost / COST_OFFSET;
     if self.max_cost {
       cost = -cost;
     }
@@ -300,6 +297,6 @@ mod test_flow {
     let result = graph.mcmf();
     dbg!(result);
     assert_eq!(result.0, 50);
-    assert!((result.1 - 280.0 * COST_ARG / COST_OFFSET).abs() < EPS);
+    assert!((result.1 - 280.0 * COST_ARG).abs() < EPS);
   }
 }
