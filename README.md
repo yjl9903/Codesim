@@ -14,6 +14,8 @@ Install codesim locally.
 cargo install --path .
 ```
 
+Ensure you have installed `clang` in your computer, and corresponding `nm`, `objdump` has been properly set in your path env.
+
 ## Usage
 
 ```bash
