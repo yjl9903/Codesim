@@ -38,10 +38,12 @@ jobs:
             for (const dirent of dirents) {
               if (dirent.isFile()) {
                 const filename = './${{ github.event.inputs.root }}/' + dirent.name;
-                const stderr = (await exec.getExecOutput('clang++', [filename, '--std=c++17', '-pedantic', '-O2'])).stderr;
-                if (stderr.length === 0) {
-                  files.push(filename);
-                }
+                try {
+                  const stderr = (await exec.getExecOutput('clang++', [filename, '--std=c++17', '-pedantic', '-O2'])).stderr;
+                  if (stderr.length === 0) {
+                    files.push(filename);
+                  }
+                } catch {}
               }
             }
             const result = [];
