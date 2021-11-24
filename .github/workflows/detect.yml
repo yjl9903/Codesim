@@ -54,3 +54,8 @@ jobs:
               console.log(`${a} v.s. ${b} : ${val}`);
             }
             writeFileSync('data.csv', result.map(r => `${r.a}, ${r.b}, ${r.val}`).join('\n'), 'utf-8');
+      - name: Upload
+        uses: actions/upload-artifact@v2
+        with:
+          name: report
+          path: data.csv
