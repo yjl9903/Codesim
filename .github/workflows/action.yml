@@ -21,4 +21,4 @@ jobs:
       - name: Run
         run: cargo run -- examples/aplusb.cpp examples/cplusd.cpp --verbose
       - name: Test
-        run: clang++ examples/aplusb.cpp --std=c++17 -###
+        run: clang++ -E -x c++ - -v < /dev/null
