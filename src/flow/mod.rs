@@ -298,6 +298,6 @@ mod test_flow {
     let result = graph.mcmf();
     dbg!(result);
     assert_eq!(result.0, 50);
-    assert!((result.1 - 280.0 * COSTARG).abs() < EPS);
+    assert!((result.1 - 280.0 * COSTARG / COSTOFFSET).abs() < EPS);
   }
 }
