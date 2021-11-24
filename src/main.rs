@@ -20,6 +20,9 @@ struct CliOption {
   #[structopt(short = "-v", long = "--verbose", help = "verbose")]
   verbose: bool,
 
+  #[structopt(long = "--skip-compile", help = "skip compile")]
+  skip_comiple: bool,
+
   #[structopt(parse(from_os_str), help = "source code")]
   code1: PathBuf,
 
@@ -37,7 +40,7 @@ fn main() {
     println!();
     println!("--- Load code1: {:?} ---", &options.code1);
   }
-  let ld1 = Loader::new(&options.code1, options.verbose);
+  let ld1 = Loader::new(&options.code1, options.skip_comiple, options.verbose);
   ld1.compile();
   let sym1 = ld1.symbol_table();
   let func1 = ld1.dump(sym1);
@@ -46,7 +49,7 @@ fn main() {
     println!();
     println!("--- Load code2: {:?} ---", &options.code2);
   }
-  let ld2 = Loader::new(&options.code2, options.verbose);
+  let ld2 = Loader::new(&options.code2, options.skip_comiple, options.verbose);
   ld2.compile();
   let sym2 = ld2.symbol_table();
   let func2 = ld2.dump(sym2);

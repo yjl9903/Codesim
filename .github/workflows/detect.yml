@@ -16,6 +16,7 @@ jobs:
     runs-on: macos-11
     steps:
       - uses: actions/checkout@v2
+      - uses: Swatinem/rust-cache@v1
       - name: Download bits/stdc++.h
         run: |
           sudo mkdir /Library/Developer/CommandLineTools/usr/include/c++/v1/bits
@@ -40,9 +41,10 @@ jobs:
             for (const dirent of dirents) {
               if (dirent.isFile()) {
                 const filename = './${{ github.event.inputs.root }}/' + dirent.name;
+                const output = dirent.name.replace(/\.[^/.]+$/, "") + '.out';
                 try {
-                  await exec.getExecOutput('clang++', [filename, '--std=c++17', '-pedantic', '-O2']);
-                  files.push(filename);
+                  await exec.getExecOutput('clang++', [filename, '--std=c++17', '-pedantic', '-O2', '-o', output]);
+                  files.push(output);
                 } catch {}
               }
             }
@@ -51,7 +53,7 @@ jobs:
               for (const b of files) {
                 if (a !== b) {
                   try {
-                    let val = (await exec.getExecOutput('codesim', [a, b])).stdout;
+                    let val = (await exec.getExecOutput('codesim', [a, b, '--skip-compile'])).stdout;
                     result.push({
                       a, b, val: Number.parseFloat(val)
                     });

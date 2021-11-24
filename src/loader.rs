@@ -19,20 +19,34 @@ lazy_static! {
 pub struct Loader {
   source: PathBuf,
   elf_temp: NamedTempFile,
+  skip_compile: bool,
   verbose: bool,
 }
 
 impl Loader {
-  pub fn new(file: &PathBuf, verbose: bool) -> Self {
+  pub fn new(file: &PathBuf, skip_compile: bool, verbose: bool) -> Self {
     let elf_temp = NamedTempFile::new().unwrap();
     Loader {
       source: file.clone(),
       elf_temp,
+      skip_compile,
       verbose,
     }
   }
 
+  fn elf(&self) -> PathBuf {
+    if self.skip_compile {
+      self.source.clone()
+    } else {
+      self.elf_temp.path().to_path_buf()
+    }
+  }
+
   pub fn compile(&self) {
+    if self.skip_compile {
+      return ;
+    }
+
     if self.verbose {
       println!("$ clang++ --std=c++17 -pedantic -O2 {:?}", self.source);
     }
@@ -59,7 +73,7 @@ impl Loader {
 
   pub fn symbol_table(&self) -> Vec<(String, u64)> {
     if self.verbose {
-      println!("$ nm {:?}", self.elf_temp.path());
+      println!("$ nm {:?}", self.elf());
     }
 
     let cmd = std::process::Command::new("nm")
@@ -67,7 +81,7 @@ impl Loader {
       .arg("--defined-only")
       // .arg("-g")
       .arg("-P")
-      .arg(self.elf_temp.path())
+      .arg(self.elf())
       .output()
       .expect("Fail to run nm");
 
@@ -99,7 +113,7 @@ impl Loader {
 
   pub fn dump(&self, symbols: Vec<(String, u64)>) -> BTreeMap<u64, Vec<u64>> {
     if self.verbose {
-      println!("$ objdump -d {:?}", self.elf_temp.path());
+      println!("$ objdump -d {:?}", self.elf());
     }
 
     let func_address = symbols
@@ -109,7 +123,7 @@ impl Loader {
 
     let cmd = std::process::Command::new("objdump")
       .arg("-d")
-      .arg(self.elf_temp.path())
+      .arg(self.elf())
       .output()
       .expect("Fail to run objdump");
 

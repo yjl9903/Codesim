@@ -16,9 +16,14 @@ jobs:
     runs-on: macos-11
     steps:
       - uses: actions/checkout@v2
+      - uses: Swatinem/rust-cache@v1
       - name: Build
         run: cargo build --verbose
       - name: Run
-        run: cargo run -- examples/aplusb.cpp examples/cplusd.cpp --verbose
+        run: |
+          cargo run -- examples/aplusb.cpp examples/cplusd.cpp --verbose
+          clang++ examples/aplusb.cpp -o aplusb.out --std=c++17
+          clang++ examples/cplusd.cpp -o cplusd.out --std=c++17
+          cargo run -- aplusb.out cplusd.out --skip-compile --verbose
       - name: Test
         run: clang++ -E -x c++ - -v < /dev/null
