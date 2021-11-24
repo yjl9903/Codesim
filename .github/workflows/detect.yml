@@ -19,6 +19,7 @@ jobs:
       - name: Download bits/stdc++.h
         run: |
           sudo mkdir /Library/Developer/CommandLineTools/usr/include/c++/v1/bits
+          sudo chmod 777 /Library/Developer/CommandLineTools/usr/include/c++/v1/bits
           sudo curl https://raw.githubusercontent.com/tekfyl/bits-stdc-.h-for-mac/master/stdc%2B%2B.h > /Library/Developer/CommandLineTools/usr/include/c++/v1/bits/stdc++.h
       - name: Build
         run: cargo install --path .
