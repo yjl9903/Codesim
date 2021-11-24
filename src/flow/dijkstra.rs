@@ -15,9 +15,9 @@ impl Ord for State {
     } else if (self.cost - other.cost).abs() <= EPS {
       self.node.cmp(&other.node)
     } else if self.cost < other.cost {
-      std::cmp::Ordering::Less
-    } else {
       std::cmp::Ordering::Greater
+    } else {
+      std::cmp::Ordering::Less
     }
   }
 }
@@ -39,7 +39,7 @@ impl PartialEq for State {
 impl Graph {
   pub fn dijkstra(&self, start: usize) -> (Vec<f64>, Vec<Option<usize>>) {
     let mut vis = vec![false; self.n + 1];
-    let mut dis = vec![COSTMAX; self.n + 1];
+    let mut dis = vec![COST_INF; self.n + 1];
     let mut pre: Vec<Option<usize>> = vec![None; self.n + 1];
 
     dis[start] = 0 as CostType;

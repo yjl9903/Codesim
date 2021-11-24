@@ -8,11 +8,13 @@ pub type CapType = i64;
 
 pub type CostType = f64;
 
-pub const COSTOFFSET: CostType = 10.0;
+pub const COST_OFFSET: CostType = 10.0;
 
-pub const COSTARG: CostType = 100.0 * COSTOFFSET;
+pub const COST_ARG: CostType = 100.0 * COST_OFFSET;
 
-pub const COSTMAX: CostType = 100000.0 * COSTARG;
+pub const COST_MAX: CostType = 100000.0 * COST_ARG;
+
+pub const COST_INF: CostType = 1e18 as CostType;
 
 pub struct Graph {
   n: usize,
@@ -98,12 +100,12 @@ impl Builder {
     };
 
     for (from, to, cap, cost) in self.edges.iter() {
-      add(*from, *to, *cap, *cost * COSTARG);
+      add(*from, *to, *cap, *cost * COST_ARG);
     }
 
     // Last edge for T -> S
     let sum_cap = self.edges.iter().map(|(_, _, cap, _)| cap).sum::<CapType>();
-    add(self.sink, self.source, sum_cap + 5, -mul_cost * COSTMAX);
+    add(self.sink, self.source, sum_cap + 5, -mul_cost * COST_MAX);
 
     Graph {
       n: self.n,
@@ -184,7 +186,7 @@ impl Graph {
         cost += e.cost * self.edges[e.rev()].cap as CostType;
       }
     }
-    cost = cost / COSTOFFSET;
+    cost = cost / COST_OFFSET;
     if self.max_cost {
       cost = -cost;
     }
@@ -206,7 +208,7 @@ impl Graph {
 
     let (dis, pre) = self.dijkstra(to);
 
-    if dis[from] < COSTMAX - EPS
+    if dis[from] < COST_INF - EPS
       && dis[from] + self.reduced_cost(&self.edges[eid]) < 0 as CostType - EPS
     {
       let rev = self.edges[eid].rev();
@@ -255,13 +257,13 @@ impl Graph {
     let mut max_dis = 0 as CostType;
     let cur_len = self.reduced_cost(&self.edges[eid]);
     for i in 0..self.n {
-      if dis[i] < COSTMAX - EPS && dis[i] > max_dis + EPS {
+      if dis[i] < COST_INF - EPS && dis[i] > max_dis + EPS {
         max_dis = dis[i];
       }
     }
 
     for i in 0..self.n {
-      if dis[i] < COSTMAX - EPS {
+      if dis[i] < COST_INF - EPS {
         self.phi[i] += dis[i];
       } else {
         self.phi[i] += max_dis;
@@ -298,6 +300,6 @@ mod test_flow {
     let result = graph.mcmf();
     dbg!(result);
     assert_eq!(result.0, 50);
-    assert!((result.1 - 280.0 * COSTARG / COSTOFFSET).abs() < EPS);
+    assert!((result.1 - 280.0 * COST_ARG / COST_OFFSET).abs() < EPS);
   }
 }
