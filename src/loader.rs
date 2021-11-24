@@ -61,9 +61,13 @@ impl Loader {
       .output();
 
     if let Ok(cmd) = res {
-      if cmd.stderr.len() > 0 {
+      if !cmd.status.success() {
+        let stderr = String::from_utf8_lossy(&cmd.stderr).into_owned();
+        eprint!("{}", stderr);
         panic!("Fail to compile {:?}", self.source);
       }
+    } else {
+      panic!("Fail to compile {:?}", self.source);
     }
 
     if self.verbose {
