@@ -74,7 +74,7 @@ impl Builder {
         to,
         cap: 0 as CapType,
         raw_cap: cap,
-        cost: COSTARG * mul_cost * cost, // Maxmimum cost
+        cost: mul_cost * cost, // Maxmimum cost
         kind: EdgeKind::Normal(normal_id + 1),
       };
       edges.push(normal);
@@ -86,7 +86,7 @@ impl Builder {
         to: from,
         cap: 0 as CapType,
         raw_cap: 0 as CapType,
-        cost: COSTARG * -mul_cost * cost, // Maxmimum cost
+        cost: -mul_cost * cost, // Maxmimum cost
         kind: EdgeKind::Rev(normal_id),
       };
       edges.push(rev);
@@ -96,12 +96,12 @@ impl Builder {
     };
 
     for (from, to, cap, cost) in self.edges.iter() {
-      add(*from, *to, *cap, *cost);
+      add(*from, *to, *cap, *cost * COSTARG);
     }
 
     // Last edge for T -> S
     let sum_cap = self.edges.iter().map(|(_, _, cap, _)| cap).sum::<CapType>();
-    add(self.sink, self.source, sum_cap + 5, -mul_cost * COSTMAX / COSTARG);
+    add(self.sink, self.source, sum_cap + 5, -mul_cost * COSTMAX);
 
     Graph {
       n: self.n,
