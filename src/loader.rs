@@ -83,7 +83,7 @@ impl Loader {
     let cmd = std::process::Command::new("nm")
       .arg("--demangle")
       .arg("--defined-only")
-      // .arg("-g")
+      .arg("-g")
       .arg("-P")
       .arg(self.elf())
       .output()
