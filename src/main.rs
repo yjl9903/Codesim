@@ -15,12 +15,12 @@ const ALPHA: f64 = 2.0;
 const BETA: f64 = 0.5;
 
 #[derive(StructOpt)]
-#[structopt(name = "codesim", about = "Diff two single C++ code")]
+#[structopt(name = "codesim", about = "Diff two single C++ code file")]
 struct CliOption {
-  #[structopt(short = "-v", long = "--verbose", help = "verbose")]
+  #[structopt(short = "-v", long = "--verbose", help = "Verbose log")]
   verbose: bool,
 
-  #[structopt(long = "--skip-compile", help = "skip compile")]
+  #[structopt(long = "--skip-compile", help = "Skip compile")]
   skip_comiple: bool,
 
   #[structopt(parse(from_os_str), help = "source code")]

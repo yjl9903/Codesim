@@ -112,6 +112,11 @@ impl Loader {
       symbols.push((func, address));
     }
 
+    if symbols.is_empty() {
+      eprintln!("No symbol found in {:?}, please check your code or elf.", self.elf());
+      panic!();
+    }
+
     symbols
   }
 
@@ -200,6 +205,11 @@ impl Loader {
       } else {
         i = i + 1;
       }
+    }
+
+    if map.is_empty() {
+      eprintln!("No symbol found in {:?}, please check your code or elf.", self.elf());
+      panic!();
     }
 
     map
