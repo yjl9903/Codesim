@@ -21,13 +21,14 @@ jobs:
           sudo mkdir /Library/Developer/CommandLineTools/usr/include/c++/v1/bits
           sudo chmod 777 /Library/Developer/CommandLineTools/usr/include/c++/v1/bits
           sudo curl https://raw.githubusercontent.com/tekfyl/bits-stdc-.h-for-mac/master/stdc%2B%2B.h > /Library/Developer/CommandLineTools/usr/include/c++/v1/bits/stdc++.h
+          cat /Library/Developer/CommandLineTools/usr/include/c++/v1/bits/stdc++.h
       - name: Build
         run: cargo install --path .
       - name: Detect
         uses: actions/github-script@v5
         with:
           script: |
-            const { readdirSync } = require('fs');
+            const { readdirSync, writeFileSync } = require('fs');
             const dirents = readdirSync('${{ github.event.inputs.root }}', { withFileTypes: true });
             const files = [];
             for (const dirent of dirents) {
@@ -52,3 +53,4 @@ jobs:
             for (const { a, b, val } of result) {
               console.log(`${a} v.s. ${b} : ${val}`);
             }
+            writeFileSync('data.csv', result.map(r => `${r.a}, ${r.b}, ${r.val}`).join('\n'), 'utf-8');
