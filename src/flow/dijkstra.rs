@@ -6,10 +6,14 @@ struct State {
   node: usize,
 }
 
+pub const EPS: CostType = 1e-12;
+
 impl Ord for State {
   fn cmp(&self, other: &Self) -> std::cmp::Ordering {
     if self.eq(other) {
       std::cmp::Ordering::Equal
+    } else if (self.cost - other.cost).abs() <= EPS {
+      self.node.cmp(&other.node)
     } else if self.cost < other.cost {
       std::cmp::Ordering::Greater
     } else {
@@ -23,8 +27,6 @@ impl PartialOrd for State {
     Some(self.cmp(other))
   }
 }
-
-pub const EPS: CostType = 1e-8;
 
 impl Eq for State {}
 

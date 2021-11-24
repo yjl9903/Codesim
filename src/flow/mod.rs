@@ -10,7 +10,7 @@ pub type CostType = f64;
 
 pub const COSTARG: CostType = 100.0;
 
-pub const COSTMAX: CostType = 10000.0 * COSTARG;
+pub const COSTMAX: CostType = 100000.0 * COSTARG;
 
 pub struct Graph {
   n: usize,
@@ -60,7 +60,7 @@ impl Builder {
     let mut edges = vec![];
     let mut succ = vec![vec![]; self.n];
 
-    let mul_cost = COSTARG * if max_cost {
+    let mul_cost = if max_cost {
       -1 as CostType
     } else {
       1 as CostType
@@ -74,7 +74,7 @@ impl Builder {
         to,
         cap: 0 as CapType,
         raw_cap: cap,
-        cost: mul_cost * cost, // Maxmimum cost
+        cost: COSTARG * mul_cost * cost, // Maxmimum cost
         kind: EdgeKind::Normal(normal_id + 1),
       };
       edges.push(normal);
@@ -86,7 +86,7 @@ impl Builder {
         to: from,
         cap: 0 as CapType,
         raw_cap: 0 as CapType,
-        cost: -mul_cost * cost, // Maxmimum cost
+        cost: COSTARG * -mul_cost * cost, // Maxmimum cost
         kind: EdgeKind::Rev(normal_id),
       };
       edges.push(rev);
@@ -101,7 +101,7 @@ impl Builder {
 
     // Last edge for T -> S
     let sum_cap = self.edges.iter().map(|(_, _, cap, _)| cap).sum::<CapType>();
-    add(self.sink, self.source, sum_cap + 5, -mul_cost * COSTMAX);
+    add(self.sink, self.source, sum_cap + 5, -mul_cost * COSTMAX / COSTARG);
 
     Graph {
       n: self.n,
@@ -196,6 +196,11 @@ impl Graph {
 
     let from = self.edges[eid].from;
     let to = self.edges[eid].to;
+
+    if self.verbose {
+      println!("Add: {} -> {}", from, to);
+    }
+
     let (dis, pre) = self.dijkstra(to);
 
     if dis[from] < COSTMAX - EPS
@@ -290,6 +295,6 @@ mod test_flow {
     let result = graph.mcmf();
     dbg!(result);
     assert_eq!(result.0, 50);
-    assert!((result.1 - 280.0).abs() < EPS);
+    assert!((result.1 - 280.0 * COSTARG).abs() < EPS);
   }
 }
