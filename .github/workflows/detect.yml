@@ -25,8 +25,8 @@ jobs:
           sudo cp /Library/Developer/CommandLineTools/usr/include/c++/v1/bits/stdc++.h /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/bits/stdc++.h
           sudo mkdir /Applications/Xcode_13.1.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/bits
           sudo cp /Library/Developer/CommandLineTools/usr/include/c++/v1/bits/stdc++.h /Applications/Xcode_13.1.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1/bits/stdc++.h
-          sudo mkdir /usr/local/include/bits
-          sudo cp /Library/Developer/CommandLineTools/usr/include/c++/v1/bits/stdc++.h  /usr/local/include/bits/stdc++.h
+          sudo mkdir /Applications/Xcode_13.1.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/bits
+          sudo cp /Library/Developer/CommandLineTools/usr/include/c++/v1/bits/stdc++.h  /Applications/Xcode_13.1.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/bits/stdc++.h
           cat /Library/Developer/CommandLineTools/usr/include/c++/v1/bits/stdc++.h
       - name: Build
         run: cargo install --path .
