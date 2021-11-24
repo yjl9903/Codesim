@@ -16,6 +16,10 @@ jobs:
     runs-on: macos-11
     steps:
       - uses: actions/checkout@v2
+      - name: Download bits/stdc++.h
+        run: |
+          mkdir /Library/Developer/CommandLineTools/usr/include/c++/v1/bits
+          curl https://raw.githubusercontent.com/tekfyl/bits-stdc-.h-for-mac/master/stdc%2B%2B.h > /Library/Developer/CommandLineTools/usr/include/c++/v1/bits/stdc++.h
       - name: Build
         run: cargo install --path .
       - name: Detect
