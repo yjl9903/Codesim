@@ -19,11 +19,13 @@ jobs:
       - uses: Swatinem/rust-cache@v1
       - name: Build
         run: cargo build --verbose
+      - name: Test
+        run: cargo test
       - name: Run
         run: |
           cargo run -- examples/aplusb.cpp examples/cplusd.cpp --verbose
           clang++ examples/aplusb.cpp -o aplusb.out --std=c++17 -pedantic -O2
           clang++ examples/cplusd.cpp -o cplusd.out --std=c++17 -pedantic -O2
           cargo run -- aplusb.out cplusd.out --skip-compile --verbose
-      - name: Test
+      - name: Include path
         run: clang++ -E -x c++ - -v < /dev/null

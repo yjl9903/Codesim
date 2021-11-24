@@ -99,11 +99,7 @@ impl Builder {
 
     // Last edge for T -> S
     let sum_cap = self.edges.iter().map(|(_, _, cap, _)| cap).sum::<CapType>();
-    if !max_cost {
-      add(self.sink, self.source, sum_cap + 5, -COSTMAX);
-    } else {
-      add(self.sink, self.source, sum_cap + 5, COSTMAX);
-    }
+    add(self.sink, self.source, sum_cap + 5, -mul_cost * COSTMAX);
 
     Graph {
       n: self.n,

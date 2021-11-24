@@ -44,7 +44,7 @@ impl Loader {
 
   pub fn compile(&self) {
     if self.skip_compile {
-      return ;
+      return;
     }
 
     if self.verbose {
@@ -59,7 +59,7 @@ impl Loader {
       .arg("-o")
       .arg(self.elf_temp.path())
       .output();
-    
+
     if let Ok(cmd) = res {
       if cmd.stderr.len() > 0 {
         panic!("Fail to compile {:?}", self.source);
