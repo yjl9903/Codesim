@@ -1,0 +1,112 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    name: Build
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            output: codesim
+            archive: tgz
+          - target: x86_64-apple-darwin
+            os: macos-latest
+            output: codesim
+            archive: zip
+          - target: aarch64-apple-darwin
+            os: macos-latest
+            output: codesim
+            archive: zip
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: FranzDiebold/github-env-vars-action@v1.2.1
+
+      - name: Install coreutils for macOS
+        if: matrix.os == 'macos-latest'
+        run: brew install coreutils
+
+      # Cache files between builds
+      - name: Setup | Cache Cargo
+        uses: actions/cache@v2.1.6
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Setup | Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          target: ${{ matrix.target }}
+          override: true
+
+      - name: Run Tests
+        run: cargo test
+
+      - name: Build release
+        uses: actions-rs/cargo@v1
+        # TODO: Remove this once it's the default
+        env:
+          SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
+        with:
+          command: build
+          args: --target ${{ matrix.target }} --release
+
+      - name: Copy and rename utility
+        run: cp target/${{ matrix.target }}/release/${{ matrix.output }} ${{ matrix.output }}
+
+      - name: Create archive (tgz, linux)
+        if: ${{ matrix.os != 'macos-latest' && matrix.os != 'windows-latest' }}
+        run: |
+          tar -czvf codesim-${{ matrix.target }}.${{ matrix.archive }} ${{ matrix.output }}
+          sha256sum codesim-${{ matrix.target }}.${{ matrix.archive }} > codesim-${{ matrix.target }}-sha256sum.txt
+      - name: Create archive (zip, macos)
+        if: ${{ matrix.os == 'macos-latest' }}
+        run: |
+          zip codesim-${{ matrix.target }}.${{ matrix.archive }} ${{ matrix.output }}
+          sha256sum codesim-${{ matrix.target }}.${{ matrix.archive }} > codesim-${{ matrix.target }}-sha256sum.txt
+      - name: Upload artifacts archive
+        uses: actions/upload-artifact@v1
+        with:
+          name: codesim-${{ matrix.target }}.${{ matrix.archive }}
+          path: codesim-${{ matrix.target }}.${{ matrix.archive }}
+
+      - name: Upload artifacts checksum
+        uses: actions/upload-artifact@v1
+        with:
+          name: codesim-${{ matrix.target }}-sha256sum.txt
+          path: codesim-${{ matrix.target }}-sha256sum.txt
+
+      - name: Upload binary to release
+        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: codesim-${{ matrix.target }}.${{ matrix.archive }}
+          asset_name: codesim-${{ matrix.target }}.${{ matrix.archive }}
+          tag: ${{ github.ref }}
+          overwrite: true
+
+      - name: Upload checksum to release
+        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: codesim-${{ matrix.target }}-sha256sum.txt
+          asset_name: codesim-${{ matrix.target }}-sha256sum.txt
+          tag: ${{ github.ref }}
+          overwrite: true
