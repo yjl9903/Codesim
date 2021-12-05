@@ -1,5 +1,7 @@
 # Codesim
 
+Diff two single C++ code file.
+
 ## Installation
 
 Get the latest Rust.
