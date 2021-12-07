@@ -18,7 +18,7 @@ cargo install --path .
 
 Ensure you have installed `clang` in your computer, and corresponding `nm`, `objdump` has been properly set in your path env.
 
-**Mac OS is highly recommended**.
+**Mac OS / Linux is highly recommended**.
 
 ## Usage
 
