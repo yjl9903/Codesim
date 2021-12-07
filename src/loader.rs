@@ -83,7 +83,7 @@ impl Loader {
 
   pub fn symbol_table(&self) -> Vec<(String, u64)> {
     if self.verbose {
-      println!("$ nm {:?}", self.elf());
+      println!("\n$ nm --demangle --defined-only -g -P {:?}", self.elf());
     }
 
     let cmd = std::process::Command::new("nm")
@@ -131,7 +131,7 @@ impl Loader {
 
   pub fn dump(&self, symbols: Vec<(String, u64)>) -> BTreeMap<u64, Vec<u64>> {
     if self.verbose {
-      println!("$ objdump -d {:?}", self.elf());
+      println!("\n$ objdump -d {:?}", self.elf());
     }
 
     let func_address = symbols
