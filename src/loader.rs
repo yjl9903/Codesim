@@ -147,6 +147,7 @@ impl Loader {
 
     fn parse_address(line: &str) -> Option<u64> {
       if let Some(address) = line.split(":").next() {
+        let address = address.trim();
         if let Ok(address) = u64::from_str_radix(address, 16) {
           Some(address)
         } else {
