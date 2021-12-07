@@ -22,6 +22,8 @@ lazy_static! {
   static ref CODE_REGEX: Regex = Regex::new(r"([0-9a-f][0-9a-f] )+").unwrap();
 }
 
+pub type DumpResult = BTreeMap<u64, Vec<u64>>;
+
 pub struct Loader {
   source: PathBuf,
   elf_temp: NamedTempFile,
@@ -129,7 +131,7 @@ impl Loader {
     symbols
   }
 
-  pub fn dump(&self, symbols: Vec<(String, u64)>) -> BTreeMap<u64, Vec<u64>> {
+  pub fn dump(&self, symbols: Vec<(String, u64)>) -> DumpResult {
     if self.verbose {
       println!("\n$ objdump -d {:?}", self.elf());
     }

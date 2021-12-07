@@ -28,13 +28,16 @@ codesim 0.1.0
 Diff two single C++ code file
 
 USAGE:
-    codesim [FLAGS] <code1> <code2>
+    codesim [FLAGS] [OPTIONS] [--] [ARGS]
 
 FLAGS:
     -h, --help            Prints help information
         --skip-compile    Skip compile
     -V, --version         Prints version information
     -v, --verbose         Verbose log
+
+OPTIONS:
+        --files <files>...    extra files
 
 ARGS:
     <code1>    source code
