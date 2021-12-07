@@ -5,6 +5,9 @@ ENV RUSTUP_HOME=/usr/local/rustup \
     PATH=/usr/local/cargo/bin:$PATH \
     RUST_VERSION=1.57.0
 
+RUN apt update; \
+    apt install -y build-essential;
+
 RUN wget https://sh.rustup.rs --output-document init.sh; \
     chmod +x init.sh; \
     ./init.sh -y --profile minimal; \
