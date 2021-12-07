@@ -11,6 +11,12 @@ lazy_static! {
     let mut set = HashSet::new();
     set.insert("__mh_execute_header");
     set.insert("___clang_call_terminate");
+    set.insert("_start");
+    set.insert("_init");
+    set.insert("_fini");
+    set.insert("__libc_csu_fini");
+    set.insert("__libc_csu_init");
+    set.insert("_dl_relocate_static_pie");
     set
   };
   static ref CODE_REGEX: Regex = Regex::new(r"([0-9a-f][0-9a-f] )+").unwrap();
