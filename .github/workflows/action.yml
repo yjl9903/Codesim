@@ -27,5 +27,4 @@ jobs:
           clang++ examples/aplusb.cpp -o aplusb.out --std=c++17 -pedantic -O2
           clang++ examples/cplusd.cpp -o cplusd.out --std=c++17 -pedantic -O2
           cargo run -- aplusb.out cplusd.out --skip-compile --verbose
-      - name: Include path
-        run: clang++ -E -x c++ - -v < /dev/null
+          cargo run -- --files examples/Sum/sample1.c examples/Sum/sample2.c examples/Sum/sample3.c examples/Sum/sample4.c examples/Sum/sample5.c examples/Sum/sample6.c
