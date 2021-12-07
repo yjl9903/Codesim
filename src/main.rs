@@ -59,6 +59,7 @@ fn main() {
       for (i, path) in options.files.iter().enumerate() {
         println!("{:?}. {:?}", i + 1, path);
       }
+      println!();
     }
 
     let lds: Vec<_> = options
@@ -66,9 +67,19 @@ fn main() {
       .iter()
       .map(|path| Loader::new(path, options.skip_comiple, options.verbose))
       .map(|ld| {
-        ld.compile();
-        let sym = ld.symbol_table();
-        ld.dump(sym)
+        ld.compile().map_or_else(
+          |msg| {
+            eprintln!("Fail to compile {:?}", ld.source);
+            if options.verbose {
+              eprintln!("{}", msg);
+            }
+            None
+          },
+          |_| {
+            let sym = ld.symbol_table();
+            Some(ld.dump(sym))
+          },
+        )
       })
       .collect();
 
@@ -82,11 +93,17 @@ fn main() {
         if i == j {
           continue;
         }
+
         let path1 = &options.files[i];
         let func1 = &lds[i];
         let path2 = &options.files[j];
         let func2 = &lds[j];
-        let result = diff_two_file(func1.clone(), func2.clone(), false);
+
+        if func1.is_none() || func2.is_none() {
+          continue;
+        }
+
+        let result = diff_two_file(func1.clone().unwrap(), func2.clone().unwrap(), false);
         rows.push((result, path1.clone(), path2.clone()));
 
         if options.verbose {
@@ -124,7 +141,9 @@ fn compile_two_file(
     println!("--- Load code1: {:?} ---", code1);
   }
   let ld1 = Loader::new(code1, options.skip_comiple, options.verbose);
-  ld1.compile();
+  if let Err(msg) = ld1.compile() {
+    eprintln!("{}", msg);
+  }
   let sym1 = ld1.symbol_table();
   let func1 = ld1.dump(sym1);
 
@@ -133,7 +152,9 @@ fn compile_two_file(
     println!("--- Load code2: {:?} ---", code2);
   }
   let ld2 = Loader::new(code2, options.skip_comiple, options.verbose);
-  ld2.compile();
+  if let Err(msg) = ld2.compile() {
+    eprintln!("{}", msg);
+  }
   let sym2 = ld2.symbol_table();
   let func2 = ld2.dump(sym2);
 

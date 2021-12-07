@@ -25,7 +25,7 @@ lazy_static! {
 pub type DumpResult = BTreeMap<u64, Vec<u64>>;
 
 pub struct Loader {
-  source: PathBuf,
+  pub source: PathBuf,
   elf_temp: NamedTempFile,
   skip_compile: bool,
   verbose: bool,
@@ -50,9 +50,9 @@ impl Loader {
     }
   }
 
-  pub fn compile(&self) {
+  pub fn compile(&self) -> Result<(), String> {
     if self.skip_compile {
-      return;
+      return Ok(());
     }
 
     if self.verbose {
@@ -71,16 +71,18 @@ impl Loader {
     if let Ok(cmd) = res {
       if !cmd.status.success() {
         let stderr = String::from_utf8_lossy(&cmd.stderr).into_owned();
-        eprint!("{}", stderr);
-        panic!("Fail to compile {:?}", self.source);
+        return Err(stderr);
       }
     } else {
-      panic!("Fail to compile {:?}", self.source);
+      let msg = format!("Fail to compile {:?}", self.source);
+      return Err(msg);
     }
 
     if self.verbose {
       println!("Compile output: {:?}", self.elf_temp.path());
     }
+
+    Ok(())
   }
 
   pub fn symbol_table(&self) -> Vec<(String, u64)> {
