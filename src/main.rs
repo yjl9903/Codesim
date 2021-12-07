@@ -7,7 +7,7 @@ extern crate lazy_static;
 
 use loader::{DumpResult, Loader};
 use solver::Solver;
-use std::path::PathBuf;
+use std::{fs::File, io::prelude::*, path::PathBuf};
 use structopt::StructOpt;
 
 const OMEGA: f64 = 1.5;
@@ -22,6 +22,9 @@ struct CliOption {
 
   #[structopt(long = "--skip-compile", help = "Skip compile")]
   skip_comiple: bool,
+
+  #[structopt(long = "--csv", help = "Output CSV")]
+  csv: Option<PathBuf>,
 
   #[structopt(parse(from_os_str), help = "source code", required_if("files", ""))]
   code1: Option<PathBuf>,
@@ -45,9 +48,10 @@ fn main() {
     let code2 = code2.unwrap();
     if options.verbose {
       println!("Diff: {:?} v.s. {:?}", code1, code2);
+      println!();
     }
     let (func1, func2) = compile_two_file(&code1, &code2, &options);
-    println!("{:.2}", diff_two_file(func1, func2, &options));
+    println!("{:.2}", diff_two_file(func1, func2, options.verbose));
   } else {
     // multi files
     if options.verbose {
@@ -68,6 +72,10 @@ fn main() {
       })
       .collect();
 
+    if options.verbose {
+      println!();
+      println!("--- Pairwise Diff ---");
+    }
     let mut rows = Vec::new();
     for i in 0..lds.len() {
       for j in 0..lds.len() {
@@ -78,14 +86,30 @@ fn main() {
         let func1 = &lds[i];
         let path2 = &options.files[j];
         let func2 = &lds[j];
-        let result = diff_two_file(func1.clone(), func2.clone(), &options);
+        let result = diff_two_file(func1.clone(), func2.clone(), false);
         rows.push((result, path1.clone(), path2.clone()));
+
+        if options.verbose {
+          println!("{:?} v.s. {:?} : {:.2}", path1, path2, result);
+        }
       }
     }
+    if options.verbose {
+      println!();
+    }
+
     rows.sort_by(|a, b| b.0.partial_cmp(&a.0).unwrap());
-    println!("id,code1,code2,similarity");
-    for (id, (score, p1, p2)) in rows.into_iter().enumerate() {
-      println!("{},{:?},{:?},{:.2}", id + 1, p1, p2, score);
+    let csv_file = options.csv.map(|f| File::create(f).unwrap());
+    if let Some(mut file) = csv_file {
+      write!(file, "id,code1,code2,similarity\n").unwrap();
+      for (id, (score, p1, p2)) in rows.into_iter().enumerate() {
+        write!(file, "{},{:?},{:?},{:.2}\n", id + 1, p1, p2, score).unwrap();
+      }
+    } else {
+      println!("id,code1,code2,similarity");
+      for (id, (score, p1, p2)) in rows.into_iter().enumerate() {
+        println!("{},{:?},{:?},{:.2}", id + 1, p1, p2, score);
+      }
     }
   }
 }
@@ -116,26 +140,26 @@ fn compile_two_file(
   (func1, func2)
 }
 
-fn diff_two_file(func1: DumpResult, func2: DumpResult, options: &CliOption) -> f64 {
+fn diff_two_file(func1: DumpResult, func2: DumpResult, verbose: bool) -> f64 {
   let sum_func1 = func1.iter().map(|(_, body)| body.len()).sum::<usize>();
 
   // Run diff
-  let solver = Solver::new(func1, func2, options.verbose);
-  if options.verbose {
+  let solver = Solver::new(func1, func2, verbose);
+  if verbose {
     println!();
     println!("--- Calc function similarity ---");
   }
   let builder = solver.construct(OMEGA, ALPHA, BETA);
 
   // Run flow
-  if options.verbose {
+  if verbose {
     println!();
     println!("--- Run MCMF ---");
   }
-  let graph = builder.build(true, options.verbose);
+  let graph = builder.build(true, verbose);
   let result = graph.mcmf();
 
-  if options.verbose {
+  if verbose {
     println!();
     println!("--- Result ---");
     println!("Flow = {}, Cost = {}", result.0, result.1.abs());
