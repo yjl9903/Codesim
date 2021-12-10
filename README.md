@@ -32,11 +32,13 @@ USAGE:
 
 FLAGS:
     -h, --help            Prints help information
+        --norm            Normalize final score
         --skip-compile    Skip compile
     -V, --version         Prints version information
     -v, --verbose         Verbose log
 
 OPTIONS:
+        --csv <csv>           Output CSV
         --files <files>...    extra files
 
 ARGS:

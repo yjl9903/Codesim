@@ -23,6 +23,9 @@ struct CliOption {
   #[structopt(long = "--skip-compile", help = "Skip compile")]
   skip_comiple: bool,
 
+  #[structopt(long = "--norm", help = "Normalize final score")]
+  is_norm: bool,
+
   #[structopt(long = "--csv", help = "Output CSV")]
   csv: Option<PathBuf>,
 
@@ -51,7 +54,7 @@ fn main() {
       println!();
     }
     let (func1, func2) = compile_two_file(&code1, &code2, &options);
-    println!("{:.2}", diff_two_file(func1, func2, options.verbose));
+    println!("{}", diff_two_file(func1, func2, options.verbose).to_string(options.is_norm));
   } else {
     // multi files
     if options.verbose {
@@ -104,10 +107,10 @@ fn main() {
         }
 
         let result = diff_two_file(func1.clone().unwrap(), func2.clone().unwrap(), false);
-        rows.push((result, path1.clone(), path2.clone()));
+        rows.push((result.eval(options.is_norm), path1.clone(), path2.clone()));
 
         if options.verbose {
-          println!("{:?} v.s. {:?} : {:.2}", path1, path2, result);
+          println!("{:?} v.s. {:?} : {}", path1, path2, result.to_string(options.is_norm));
         }
       }
     }
@@ -161,7 +164,7 @@ fn compile_two_file(
   (func1, func2)
 }
 
-fn diff_two_file(func1: DumpResult, func2: DumpResult, verbose: bool) -> f64 {
+fn diff_two_file(func1: DumpResult, func2: DumpResult, verbose: bool) -> Score {
   let sum_func1 = func1.iter().map(|(_, body)| body.len()).sum::<usize>();
 
   // Run diff
@@ -187,8 +190,31 @@ fn diff_two_file(func1: DumpResult, func2: DumpResult, verbose: bool) -> f64 {
     println!();
   }
 
-  let sum_func1 = sum_func1 as f64 / (1.0 + (-ALPHA + BETA).exp());
-  let score = result.1 / sum_func1;
+  Score::new(result.1, sum_func1)
+}
 
-  score.abs()
+struct Score(f64, usize);
+
+impl Score {
+  fn new(score: f64, sum: usize) -> Score {
+    Score(score, sum)
+  }
+
+  fn to_string(&self, is_norm: bool) -> String {
+    format!("{:.2}", self.eval(is_norm))
+  }
+
+  fn eval(&self, is_norm: bool) -> f64 {
+    let score = if is_norm {
+      let sum_func = self.1 as f64 / (1.0 + (-ALPHA + BETA).exp());
+      self.0 / sum_func
+    } else {
+      self.0 / self.1 as f64
+    };
+    if score < flow::EPS {
+      0.0
+    } else {
+      score
+    }
+  }
 }
