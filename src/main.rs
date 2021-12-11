@@ -62,14 +62,19 @@ fn main() {
       for (i, path) in options.files.iter().enumerate() {
         println!("{:?}. {:?}", i + 1, path);
       }
-      println!();
     }
+
+    let verbose = options.verbose;
 
     let lds: Vec<_> = options
       .files
       .iter()
       .map(|path| Loader::new(path, options.skip_comiple, options.verbose))
       .map(|ld| {
+        if verbose {
+          println!("");
+        }
+
         ld.compile().map_or_else(
           |msg| {
             eprintln!("Fail to compile {:?}", ld.source);
