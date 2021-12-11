@@ -39,36 +39,14 @@ jobs:
             const { readdirSync, writeFileSync } = require('fs');
             const dirents = readdirSync('${{ github.event.inputs.root }}', { withFileTypes: true });
             const files = [];
+            const report = `report/${ basename('${{ github.event.inputs.root }}') }.csv`;
             for (const dirent of dirents) {
               if (dirent.isFile()) {
                 const filename = './${{ github.event.inputs.root }}/' + dirent.name;
-                const output = dirent.name.replace(/\.[^/.]+$/, "") + '.out';
-                try {
-                  await exec.getExecOutput('clang++', [filename, '--std=c++17', '-pedantic', '-O2', '-o', output]);
-                  files.push(output);
-                } catch {}
+                files.push(filename)
               }
             }
-            const result = [];
-            for (const a of files) {
-              for (const b of files) {
-                if (a !== b) {
-                  try {
-                    let val = (await exec.getExecOutput('codesim', [a, b, '--skip-compile'])).stdout;
-                    result.push({
-                      a, b, val: Number.parseFloat(val)
-                    });
-                  } catch {}
-                }
-              }
-            }
-            result.sort((lhs, rhs) => rhs.val - lhs.val);
-            for (const { a, b, val } of result) {
-              if (val <= 10.0) break;
-              console.log(`${a} v.s. ${b} : ${val}`);
-            }
-            await io.mkdirP('report');
-            writeFileSync(`report/${ basename('${{ github.event.inputs.root }}') }.csv`, 'code1,code2,similarity\n' + result.map(r => `${r.a}, ${r.b}, ${r.val}`).join('\n'), 'utf-8');
+            await exec('codesim', ['--verbose', '--csv', report, '--files', ...files])
       - name: Upload
         uses: actions/upload-artifact@v2
         with:
