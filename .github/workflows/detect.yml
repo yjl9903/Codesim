@@ -46,6 +46,7 @@ jobs:
                 files.push(filename)
               }
             }
+            await io.mkdirP('report');
             await exec.exec('codesim', ['--verbose', '--csv', report, '--files', ...files])
       - name: Upload
         uses: actions/upload-artifact@v2
