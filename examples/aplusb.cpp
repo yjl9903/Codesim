@@ -39,10 +39,5 @@ int main() {
   cin >> a >> b;
   APlusB solver = APlusB(a, b);
   cout << "Struct: " << solver.eval() << endl;
-
-  function<int(int,int)> aplusb = [=](int a, int b) {
-    return a + b;
-  };
-  cout << "Lambda: " << aplusb(a, b) << endl;
   return 0;
 }
