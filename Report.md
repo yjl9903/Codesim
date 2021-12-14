@@ -52,4 +52,4 @@ Then, create  a weighted flow network graph like this
 
 The maximum cost divided by the total size of the first program is the final result. You can see more details in the original [paper](https://cs.nju.edu.cn/changxu/1_publications/18/TURC18.pdf).
 
-The differences from the original paper are that we extract the full instructions not ignoring the operands. We use the final the maximum cost divided by the total size multiplied by $1 + \exp(-ALPHA + BETA)$ (you can enable this by passing argument `--norm`).
+The differences from the original paper are that we extract the full instructions not ignoring the operands. We use the final the maximum cost divided by the total size multiplied by $1 + \exp(-\alpha + \beta)$ (you can enable this by passing argument `--norm`).
