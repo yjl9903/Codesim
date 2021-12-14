@@ -65,9 +65,6 @@ jobs:
       - name: Run Tests
         run: cargo test
 
-      - run: ls /Library/Developer/CommandLineTools/SDKs/
-        if: ${{ matrix.os == 'macos-latest' }}
-
       - name: Build release
         uses: actions-rs/cargo@v1
         env:
