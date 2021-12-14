@@ -87,13 +87,12 @@ impl Loader {
 
   pub fn symbol_table(&self) -> Vec<(String, u64)> {
     if self.verbose {
-      println!("\n$ nm --demangle --defined-only -g -P {:?}", self.elf());
+      println!("\n$ nm --demangle --defined-only -P {:?}", self.elf());
     }
 
     let cmd = std::process::Command::new("nm")
       .arg("--demangle")
       .arg("--defined-only")
-      .arg("-g")
       .arg("-P")
       .arg(self.elf())
       .output()
@@ -111,7 +110,7 @@ impl Loader {
         continue;
       };
       let func = line.get(0).unwrap().to_string();
-      if SYMTABLE_BLACKLIST.contains(&func[..]) || func.starts_with("std::") {
+      if SYMTABLE_BLACKLIST.contains(&func[..]) || func.find("std::").is_some() {
         continue;
       }
       let address = line.get(1).unwrap().split(" ").next().unwrap().to_string();

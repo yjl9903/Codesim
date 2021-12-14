@@ -25,7 +25,7 @@ clang++ --std=c++17 -pedantic -O2 {{filename}}
 And then list symbols in the object file.
 
 ```bash
-nm --demangle --defined-only -g -P {{object}}
+nm --demangle --defined-only -P {{object}}
 ```
 
 Notice that we will extract all the symbols in the text (code) section, and then filter all the functions whose names start with `std::` and some other special functions like `_start`.
