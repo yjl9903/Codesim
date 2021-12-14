@@ -46,16 +46,25 @@ ARGS:
     <code2>    target code
 ```
 
-If you have not installed `clang`, you can pre-compile two codes manually, and pass `--skip-compile` to `codesim`.
+For example, run codesim on the example codes.
+
+```bash
+codesim examples/aplusb.cpp examples/cplusd.cpp
+codesim examples/cplusd.cpp examples/aplusb.cpp
+```
+
+If you have not installed `clang`, you can compile two codes manually, and pass `--skip-compile` to `codesim`.
 
 ```bash
 codesim a.out b.out --skip-compile
 ```
 
-## Github Actions
+You can also run codesim on multiple files pairwise.
 
-If you do not have a Mac OS machine or Linux machine, you can try it with the power of [Github Actions](https://github.com/features/actions). Github Actions config file has been provided in `/.github/workflows/`. You can create a **private repo** with this folder, and run "Detect Code Plagiarism" in the web page manually.
+```bash
+codesim --files examples/Sum/sample1.c examples/Sum/sample2.c examples/Sum/sample3.c
+```
 
 ## Docker
 
-Dockerfile is also provided. You can use it to avoid installing deps in your machine.
+Dockerfile is provided. You can use it to avoid installing deps in your machine.
