@@ -68,7 +68,7 @@ jobs:
       - name: Build release
         uses: actions-rs/cargo@v1
         env:
-          SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
+          SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX12.0.sdk
         with:
           command: build
           args: --target ${{ matrix.target }} --release
