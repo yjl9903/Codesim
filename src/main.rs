@@ -54,7 +54,10 @@ fn main() {
       println!();
     }
     let (func1, func2) = compile_two_file(&code1, &code2, &options);
-    println!("{}", diff_two_file(func1, func2, options.verbose).to_string(options.is_norm));
+    println!(
+      "{}",
+      diff_two_file(func1, func2, options.verbose).to_string(options.is_norm)
+    );
   } else {
     // multi files
     if options.verbose {
@@ -115,7 +118,12 @@ fn main() {
         rows.push((result.eval(options.is_norm), path1.clone(), path2.clone()));
 
         if options.verbose {
-          println!("{:?} v.s. {:?} : {}", path1, path2, result.to_string(options.is_norm));
+          println!(
+            "{:?} v.s. {:?} : {}",
+            path1,
+            path2,
+            result.to_string(options.is_norm)
+          );
         }
       }
     }

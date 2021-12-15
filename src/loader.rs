@@ -17,6 +17,10 @@ lazy_static! {
     set.insert("__libc_csu_fini");
     set.insert("__libc_csu_init");
     set.insert("_dl_relocate_static_pie");
+    set.insert("frame_dummy");
+    set.insert("register_tm_clones");
+    set.insert("deregister_tm_clones");
+    set.insert("__do_global_dtors_aux");
     set
   };
   static ref CODE_REGEX: Regex = Regex::new(r"([0-9a-f][0-9a-f] )+").unwrap();
@@ -110,7 +114,14 @@ impl Loader {
         continue;
       };
       let func = line.get(0).unwrap().to_string();
-      if SYMTABLE_BLACKLIST.contains(&func[..]) || func.find("std::").is_some() {
+      let global_sub = format!(
+        "_GLOBAL__sub_I_{}",
+        self.source.file_name().unwrap().to_string_lossy()
+      );
+      if SYMTABLE_BLACKLIST.contains(&func[..])
+        || func.find("std::").is_some()
+        || func.starts_with(&global_sub)
+      {
         continue;
       }
       let address = line.get(1).unwrap().split(" ").next().unwrap().to_string();
