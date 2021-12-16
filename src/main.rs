@@ -51,7 +51,6 @@ fn main() {
     let code2 = code2.unwrap();
     if options.verbose {
       println!("Diff: {:?} v.s. {:?}", code1, code2);
-      println!();
     }
     let (func1, func2) = compile_two_file(&code1, &code2, &options);
     println!(
