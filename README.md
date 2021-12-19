@@ -4,10 +4,24 @@ Diff two single C++ code file.
 
 ## Installation
 
-Get the latest Rust.
+Ensure you have installed `clang` in your computer, and corresponding `nm`, `objdump` has been properly set in your path env.
+
+Run the following in your terminal
+
+```bash
+curl -fsSL https://bina.egoist.sh/yjl9903/Codesim | sh
+```
+
+Or you can manually install codesim. Get the latest Rust.
 
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+Install codesim with cargo.
+
+```bash
+cargo install codesim
 ```
 
 Install codesim locally.
@@ -15,8 +29,6 @@ Install codesim locally.
 ```bash
 cargo install --path .
 ```
-
-Ensure you have installed `clang` in your computer, and corresponding `nm`, `objdump` has been properly set in your path env.
 
 **Mac OS / Linux is highly recommended**.
 
