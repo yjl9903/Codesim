@@ -6,7 +6,7 @@ Diff two single C++ code file.
 
 Ensure you have installed `clang` in your computer, and corresponding `nm`, `objdump` has been properly set in your path env.
 
-Run the following in your terminal
+Run the following in your terminal.
 
 ```bash
 curl -fsSL https://bina.egoist.sh/yjl9903/Codesim | sh
