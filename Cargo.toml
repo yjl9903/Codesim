@@ -7,6 +7,11 @@ authors = ["XLor yjl9903@vip.qq.com"]
 license = "MIT"
 readme = "README.md"
 
+homepage = "https://github.com/yjl9903/Codesim"
+repository = "https://github.com/yjl9903/Codesim"
+keywords = ["plagiarism"]
+categories = ["command-line-utilities"]
+
 description = "Diff two single C++ code file."
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
