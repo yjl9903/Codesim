@@ -1,5 +1,7 @@
 # Codesim
 
+[![Build test](https://github.com/yjl9903/Codesim/actions/workflows/action.yml/badge.svg)](https://github.com/yjl9903/Codesim/actions/workflows/action.yml) ![release](https://img.shields.io/github/v/release/yjl9903/Codesim) ![crates.io](https://img.shields.io/crates/v/codesim.svg) ![MIT](https://img.shields.io/crates/l/codesim)
+
 Diff two single C++ code file.
 
 ## Installation
