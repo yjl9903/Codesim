@@ -2,6 +2,36 @@
 
 Codesim is a reproduction of [Needle: Detecting Code Plagiarism on Student Submissions](https://cs.nju.edu.cn/changxu/1_publications/18/TURC18.pdf). It supports performing a similarity check on two single-file C++ programs.
 
+## Installation
+
+Ensure you have installed `clang` in your computer, and corresponding `nm`, `objdump` has been properly set in your path env.
+
+Run the following in your terminal.
+
+```bash
+curl -fsSL https://bina.egoist.sh/yjl9903/Codesim | sh
+```
+
+Or you can manually install codesim. Get the latest Rust.
+
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+Install codesim with cargo.
+
+```bash
+cargo install codesim
+```
+
+Install codesim locally.
+
+```bash
+cargo install --path .
+```
+
+**Mac OS / Linux is highly recommended**.
+
 ## Algorithm
 
 ### Steps
