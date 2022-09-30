@@ -21,7 +21,7 @@ struct CliOption {
   verbose: bool,
 
   #[structopt(long = "--skip-compile", help = "Skip compile")]
-  skip_comiple: bool,
+  skip_compile: bool,
 
   #[structopt(long = "--norm", help = "Normalize final score")]
   is_norm: bool,
@@ -71,7 +71,7 @@ fn main() {
     let lds: Vec<_> = options
       .files
       .iter()
-      .map(|path| Loader::new(path, options.skip_comiple, options.verbose))
+      .map(|path| Loader::new(path, options.skip_compile, options.verbose))
       .map(|ld| {
         if verbose {
           println!("");
@@ -155,7 +155,7 @@ fn compile_two_file(
     println!();
     println!("--- Load code1: {:?} ---", code1);
   }
-  let ld1 = Loader::new(code1, options.skip_comiple, options.verbose);
+  let ld1 = Loader::new(code1, options.skip_compile, options.verbose);
   if let Err(msg) = ld1.compile() {
     eprintln!("{}", msg);
   }
@@ -166,7 +166,7 @@ fn compile_two_file(
     println!();
     println!("--- Load code2: {:?} ---", code2);
   }
-  let ld2 = Loader::new(code2, options.skip_comiple, options.verbose);
+  let ld2 = Loader::new(code2, options.skip_compile, options.verbose);
   if let Err(msg) = ld2.compile() {
     eprintln!("{}", msg);
   }
